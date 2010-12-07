@@ -11,6 +11,19 @@
 (defn flag-for [v]
   (not (.startsWith v "--no-")))
 
+(defn opt? [x] (.startsWith x "-"))
+
+(defn parse-args [args]
+  (into {}
+        (map (fn [[k v]]
+               (if (and (opt? k) (or (nil? v) (opt? v)))
+                 [k (flag-for k)]
+                 [k v]))
+             (filter (fn [[k v]] (and (opt? k)))
+                     (partition-all 2 1 args)))))
+
+(parse-args '("-v" "--port" "8080" "--foo" "bar" "--no-quiet"))
+
 (defn parse-args [args]
   (loop [args args
          result []]
@@ -36,6 +49,9 @@
 (option* (parse-args '("--no-v")) ["-v" "--verbose" :default true])
 ;; (option* [] ["-p" "--port PORT" :default 8080] #(Integer. %))
 ;; (parameter* [] )
+
+
+
 
 
 
