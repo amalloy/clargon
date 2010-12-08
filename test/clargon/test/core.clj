@@ -12,7 +12,8 @@
 
 (deftest with-required
   (is (thrown-with-msg? Exception #"host is a required parameter"
-        (required* (parse-args '()) ["-h" "--host"]))))
+        (required* (parse-args '()) ["-h" "--host"])))
+  (is (= [:verbose false] (required* (parse-args '("--no-verbose")) ["--verbose" :default false]))))
 
 (deftest syntax
   (is (= {:port 8080

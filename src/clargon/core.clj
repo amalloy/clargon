@@ -29,7 +29,7 @@
                    (first))
         v (if (nil? value) (:default options) (last value))]
     (if (and (options :required)
-             (not v))
+             (nil? v))
       (throw (Exception. (str name " is a required parameter"))))
     [(keyword name) (parse-fn v)]))
 
@@ -41,17 +41,4 @@
          ~'option (partial option* args#)
          ~'required (partial required* args#)]
      (reduce merge {} (do [~@specs]))))
-
-;; (let [args '("--host" "localhost" "-p" "8080")]
-;;   (clargon args
-;;            (option ["--host"])
-;;            (option ["-p" "--port" :default 9090] #(Integer. %))))
-
-
-
-
-
-
-
-
 
