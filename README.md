@@ -4,13 +4,13 @@ Clargon is a Command Line ARG parser...ON.
 
 ## Usage
 
-   (clargon *command-line-args*
+   (clargon \*command-line-args\*
      (required ["-p" "--port"] #(Integer. %)
      (option ["-h" "--host" :default "localhost"])
      (option ["--verbose" :default true])
      (option ["--log-directory" :default "/some/path"]))
 
-with *command-line-args* of:
+with \*command-line-args\* of:
 
      '("-p" "8080" "--no-verbose" "--log-directory" "/tmp")
 
