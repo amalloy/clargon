@@ -4,6 +4,8 @@ Clargon is a Command Line ARG parser...ON.
 
 ## Usage
 
+Example:
+
    (clargon \*command-line-args\*
      (required ["-p" "--port"] #(Integer. %)
      (option ["-h" "--host" :default "localhost"])
