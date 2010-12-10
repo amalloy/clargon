@@ -8,7 +8,7 @@ Example:
 
     (clargon *command-line-args*
       (required ["-p" "--port" "the port for the server"] #(Integer. %)
-      (optional ["-h" "--host" "hostname of server" :default "localhost"])
+      (optional ["--host" "hostname of server" :default "localhost"])
       (optional ["--verbose" "run in chatty mode" :default true])
       (optional ["--log-directory" "where you put logs" :default "/some/path"]))
 
