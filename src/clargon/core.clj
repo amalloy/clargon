@@ -36,7 +36,7 @@
                (if (and (opt? k) (or (nil? v) (opt? v)))
                  [(name-for k) (flag-for k)]
                  [(name-for k) v]))
-             (filter (fn [[k v]] (and (opt? k)))
+             (filter (fn [[k v]] (opt? k))
                      (partition-all 2 1 args)))))
 
 (defn optional* [args params & [parse-fn]]

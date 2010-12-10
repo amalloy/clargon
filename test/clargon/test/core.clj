@@ -9,6 +9,6 @@
           :log-directory "/tmp"}
          (clargon '("-p" "8080" "--no-verbose" "--log-directory" "/tmp")
                   (required ["-p" "--port"] #(Integer. %))
-                  (optional ["-h" "--host" :default "localhost"])
+                  (optional ["--host" :default "localhost"])
                   (optional ["--verbose" :default true])
                   (optional ["--log-directory" :default "/some/path"])))))
