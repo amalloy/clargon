@@ -7,10 +7,10 @@ Clargon is a Command Line ARG parser...ON.
 Example:
 
         (clargon *command-line-args*
-     (required ["-p" "--port"] #(Integer. %)
-     (option ["-h" "--host" :default "localhost"])
-     (option ["--verbose" :default true])
-     (option ["--log-directory" :default "/some/path"]))
+     (required ["-p" "--port" "the port for the server"] #(Integer. %)
+     (optional ["-h" "--host" "hostname of server" :default "localhost"])
+     (optional ["--verbose" "run in chatty mode" :default true])
+     (optional ["--log-directory" "where you put logs" :default "/some/path"]))
 
 with \*command-line-args\* of:
 
@@ -23,10 +23,15 @@ will produce a clojure map with the names picked out for you as keywords:
       :verbose false
       :log-directory "/tmp"}
 
-Required parameters will throw an Exception if not given, optionals
-will not. Defaults can be provided as shown above.
+A flat of -h of --help is provided which will currently give a
+rudementary documentation string.
+
+Required parameters will halt program execution if not provided,
+optionals will not. Defaults can be provided as shown above.
 
 ## TODO
+
+Improve the documentation string provided when -h|--help is given.
 
 Support arbritrary nested maps by some kind of convention of parameter
 naming that I havent thought of yet O_o.
