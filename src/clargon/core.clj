@@ -4,18 +4,14 @@
 ;; help message stuff
 
 (defn build-doc [{:keys [switches docs options]}]
-  [switches
+  [(apply str (interpose "," switches))
    (or docs "")
    (if (options :default) (str "default: " (options :default)) "")
    (if (options :required) "*REQUIRED*" "")])
 
-(defn max-length [docs f]
-  (apply max (map count (map f docs))))
-
 (defn pdoc [docs]
-  (let [max-lengths (map #(max-length docs %) [first second])]
-    (doseq [d docs]
-      (println d))))
+  (let [max-lengths (for [d docs] (map count d))]
+    max-lengths))
 
 (defn show-help [specs]
   (println "usage:")
