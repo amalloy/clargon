@@ -1,23 +1,29 @@
 (ns clargon.core
-  (:use [clojure.contrib.str-utils :only (re-sub)]))
+  (:use [clojure.contrib.str-utils :only (re-sub)]
+        [clojure.contrib.pprint :only (cl-format)]))
 
 ;; help message stuff
 
 (defn build-doc [{:keys [switches docs options]}]
-  [(apply str (interpose "," switches))
+  [(apply str (interpose ", " switches))
    (or docs "")
-   (if (options :default) (str "default: " (options :default)) "")
-   (if (options :required) "*REQUIRED*" "")])
-
-(defn pdoc [docs]
-  (let [max-lengths (for [d docs] (map count d))]
-    max-lengths))
+   (or (str (options :default)) "")
+   (if (options :required) "Yes" "No")])
 
 (defn show-help [specs]
-  (println "usage:")
+  (println "Usage:")
   (println)
-  (let [docs (map build-doc specs)]
-    (pdoc docs)))
+  (let [docs (into (map build-doc specs)
+                   [["--------" "----" "-------" "--------"]
+                    ["Switches" "Desc" "Default" "Required"]])
+        sizes (for [d docs] (map count d))
+        max-cols (map #(apply max %)
+                      (apply map (fn [& c] (apply vector c)) sizes))
+        vs (for [d docs]
+             (mapcat (fn [& x] (apply vector x)) max-cols d))]
+    (doseq [v vs]
+      (cl-format true "~{ ~vA  ~vA  ~vA  ~vA ~}" v)
+      (prn))))
 
 ;; option parsing
 
@@ -56,6 +62,14 @@
 (defn required* [args params & [parse-fn]]
   (optional* args (into params [:required true]) parse-fn))
 
+(defn print-and-fail [msg]
+  (println msg)
+  (System/exit 1))
+
+(defn help-and-quit [specs]
+  (show-help specs)
+  (System/exit 0))
+
 (defn parse-specs [{:keys [parse-fn aliases options name]} args]
   (let [raw (->> (map #(args %) aliases)
                  (remove nil?)
@@ -63,12 +77,13 @@
         raw (if (nil? raw)
               (:default options)
               raw)]
-    (if (and (nil? raw) (:required options))
-      (throw (Exception. (str name " is a required parameter")))
+    (if (and (nil? raw)
+             (:required options))
+      (print-and-fail (str name " is a required parameter"))
       (try
         [(keyword name) (parse-fn raw)]
-        (catch Exception e
-          (throw (Exception. (str "could not parse " name " value of " raw)) e))))))
+        (catch Exception _
+          (print-and-fail (str "could not parse " name " with value of " raw)))))))
 
 (defmacro clargon [args & specs]
   `(let [args# (parse-args ~args)
@@ -76,11 +91,5 @@
          ~'required (partial required* args#)
          specs# (do [~@specs])]
      (if (some #(or (= "-h" %) (= "--help" %)) ~args)
-       (do
-         (show-help specs#)
-         (System/exit 0))
-       (try
-         (into {} (map #(parse-specs % args#) specs#))
-         (catch Exception e#
-           (println (.getMessage e#))
-           (System/exit 0))))))
+       (help-and-quit specs#)
+       (into {} (map #(parse-specs % args#) specs#)))))

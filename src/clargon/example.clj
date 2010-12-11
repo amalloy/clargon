@@ -5,10 +5,10 @@
 (defn -main [& args]
   (let [cla
         (clargon args
-                 (required ["-p" "--port" "the server port"] #(Integer. %))
-                 (required ["--host" "the server hostname"])
-                 (optional ["-v" "--verbose" "output lots of logging" :default false])
-                 (optional ["--debug" "run in debug mode" :default false]))]
+                 (required ["-p" "--port" "the port for the server"] #(Integer. %))
+                 (optional ["--host" "hostname of server" :default "localhost"])
+                 (optional ["--verbose" "run in chatty mode" :default true])
+                 (optional ["--log-directory" "where you put logs" :default "/some/path"]))]
     (println cla)))
 
 
