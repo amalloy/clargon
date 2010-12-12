@@ -16,14 +16,13 @@
   (let [docs (into (map build-doc specs)
                    [["--------" "----" "-------" "--------"]
                     ["Switches" "Desc" "Default" "Required"]])
-        sizes (for [d docs] (map count d))
-        max-cols (map #(apply max %)
-                      (apply map (fn [& c] (apply vector c)) sizes))
+        max-cols (->> (for [d docs] (map count d))
+                      (apply map (fn [& c] (apply vector c)))
+                      (map #(apply max %)))
         vs (for [d docs]
              (mapcat (fn [& x] (apply vector x)) max-cols d))]
     (doseq [v vs]
-      (cl-format true "~{ ~vA  ~vA  ~vA  ~vA ~}" v)
-      (prn))))
+      (cl-format true "~{ ~vA  ~vA  ~vA  ~vA ~&~}" v))))
 
 ;; option parsing
 
