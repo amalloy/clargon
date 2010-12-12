@@ -6,23 +6,24 @@
 
 (defn build-doc [{:keys [switches docs options]}]
   [(apply str (interpose ", " switches))
-   (or docs "")
    (or (str (options :default)) "")
-   (if (options :required) "Yes" "No")])
+   (if (options :required) "Yes" "No")
+   (or docs "")])
 
 (defn show-help [specs]
   (println "Usage:")
   (println)
   (let [docs (into (map build-doc specs)
-                   [["--------" "----" "-------" "--------"]
-                    ["Switches" "Desc" "Default" "Required"]])
+                   [["--------" "-------" "--------" "----"]
+                    ["Switches" "Default" "Required" "Desc"]])
         max-cols (->> (for [d docs] (map count d))
                       (apply map (fn [& c] (apply vector c)))
                       (map #(apply max %)))
         vs (for [d docs]
              (mapcat (fn [& x] (apply vector x)) max-cols d))]
     (doseq [v vs]
-      (cl-format true "~{ ~vA  ~vA  ~vA  ~vA ~&~}" v))))
+      (cl-format true "~{ ~vA  ~vA  ~vA  ~vA ~}" v)
+      (prn))))
 
 ;; option parsing
 
