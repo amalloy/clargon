@@ -7,7 +7,7 @@ Clargon is a Command Line ARG parser...ON. (For clojure).
 Example:
 
     (clargon args
-      (required ["-p" "--port" "the port for the server"] #(Integer. %)
+      (required ["-p" "--port" "the port for the server"] #(Integer. %))
       (optional ["--host" "hostname of server" :default "localhost"])
       (optional ["--verbose" "run in chatty mode" :default true])
       (optional ["--log-directory" "where you put logs" :default "/some/path"])))
