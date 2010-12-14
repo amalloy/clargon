@@ -28,12 +28,12 @@ documentation string:
 
     Usage:
 
-     Switches         Desc                     Default     Required 
-     --------         ----                     -------     -------- 
-     -p, --port       the port for the server              Yes      
-     --host           hostname of server       localhost   No       
-     --verbose        run in chatty mode       true        No       
-     --log-directory  where you put logs       /some/path  No       
+     Switches         Default     Required   Desc                     
+     --------         -------     --------   ----                     
+     -p, --port                   Yes        the port for the server  
+     --host           localhost   No         hostname of server       
+     --verbose        true        No         run in chatty mode       
+     --log-directory  /some/path  No         where you put logs       
 
 Required parameters will halt program execution if not provided,
 optionals will not. Defaults can be provided as shown above. Errors
