@@ -2,6 +2,15 @@
   (:use [clojure.contrib.str-utils :only (re-sub)]
         [clojure.contrib.pprint :only (cl-format)]))
 
+(defmacro and-print
+  "A useful debugging tool when you can't figure out what's going on:
+  wrap a form with and-print, and the form will be printed alongside
+  its result. The result will still be passed along."
+  [val]
+  `(let [x# ~val]
+     (println '~val "is" x#)
+     x#))
+
 ;; help message stuff
 
 (defn build-doc [{:keys [switches docs options]}]
@@ -45,22 +54,22 @@
              (filter (fn [[k v]] (opt? k))
                      (partition-all 2 1 args)))))
 
-(defn optional* [args params & [parse-fn]]
-  (let [parse-fn (or parse-fn (fn [v] v))
-        options (apply hash-map (drop-while string? params))
-        switches (take-while #(and (string? %) (opt? %)) params)
-        docs (first (filter #(and (string? %) (not (opt? %))) params))
+(defn optional* [params & [parse-fn]]
+  (let [parse-fn (or parse-fn identity)
+        [arglist options] (split-with string? params)
+        options (apply hash-map options)
+        [switches [docs]] (split-with opt? arglist)
         aliases (map name-for switches)
         name (or (options :name) (last aliases))]
-    {:parse-fn parse-fn
-     :options options
-     :aliases aliases
-     :switches switches
-     :docs docs
-     :name name}))
+    (and-print {:parse-fn parse-fn
+      :options options
+      :aliases aliases
+      :switches switches
+      :docs docs
+      :name name})))
 
-(defn required* [args params & [parse-fn]]
-  (optional* args (into params [:required true]) parse-fn))
+(defn required* [params & [parse-fn]]
+  (optional* (into params [:required true]) parse-fn))
 
 (defn print-and-fail [msg]
   (println msg)
@@ -71,9 +80,7 @@
   (System/exit 0))
 
 (defn parse-specs [{:keys [parse-fn aliases options name]} args]
-  (let [raw (->> (map #(args %) aliases)
-                 (remove nil?)
-                 (first))
+  (let [raw (first (keep args aliases))
         raw (if (nil? raw)
               (:default options)
               raw)]
@@ -87,8 +94,8 @@
 
 (defmacro clargon [args & specs]
   `(let [args# (parse-args ~args)
-         ~'optional (partial optional* args#)
-         ~'required (partial required* args#)
+         ~'optional optional*
+         ~'required required*
          specs# (do [~@specs])]
      (if (some #(or (= "-h" %) (= "--help" %)) ~args)
        (help-and-quit specs#)
